@@ -8,15 +8,15 @@
 import Foundation
 
 enum MovieType {
-    case nowPlaying
     case popular
+    case nowPlaying
     case topRated
     case upcoming
     
     var endpoint: String {
         switch self {
-        case .nowPlaying: return "now_playing"
         case .popular: return "popular"
+        case .nowPlaying: return "now_playing"
         case .topRated: return "top_rated"
         case .upcoming: return "upcoming"
         }
