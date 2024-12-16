@@ -37,6 +37,8 @@ final class MovieListCollectionViewCell: UICollectionViewCell {
     }
     
     func updateUI(posterPath: String) {
-        posterImgView.sd_setImage(with: URL(string: posterPath))
+        let baseURL = "https://image.tmdb.org/t/p/w500"
+        let fullURL = baseURL + posterPath
+        posterImgView.sd_setImage(with: URL(string: fullURL))
     }
 }

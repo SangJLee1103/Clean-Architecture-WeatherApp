@@ -18,6 +18,8 @@
 		DE27000F2D0DC12E005C9DCF /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DE27000E2D0DC12E005C9DCF /* Config.xcconfig */; };
 		DE2700122D0EDB3F005C9DCF /* MovieListCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2700112D0EDB3F005C9DCF /* MovieListCollectionViewCell.swift */; };
 		DE2700142D0F0788005C9DCF /* MovieListTitleHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2700132D0F0788005C9DCF /* MovieListTitleHeaderView.swift */; };
+		DE2700162D10471C005C9DCF /* DefaultMovieUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2700152D10471B005C9DCF /* DefaultMovieUseCase.swift */; };
+		DE2700182D10481B005C9DCF /* MovieListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2700172D10481B005C9DCF /* MovieListViewModel.swift */; };
 		DE27FFFB2D0D5AD2005C9DCF /* MovieListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE27FFFA2D0D5AD2005C9DCF /* MovieListViewController.swift */; };
 		DE27FFFF2D0D7724005C9DCF /* MovieResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE27FFFE2D0D7724005C9DCF /* MovieResponseDTO.swift */; };
 		DEF556E02D0D4E9400CF86AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF556DF2D0D4E9400CF86AA /* AppDelegate.swift */; };
@@ -66,6 +68,8 @@
 		DE27000E2D0DC12E005C9DCF /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		DE2700112D0EDB3F005C9DCF /* MovieListCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListCollectionViewCell.swift; sourceTree = "<group>"; };
 		DE2700132D0F0788005C9DCF /* MovieListTitleHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListTitleHeaderView.swift; sourceTree = "<group>"; };
+		DE2700152D10471B005C9DCF /* DefaultMovieUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMovieUseCase.swift; sourceTree = "<group>"; };
+		DE2700172D10481B005C9DCF /* MovieListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListViewModel.swift; sourceTree = "<group>"; };
 		DE27FFFA2D0D5AD2005C9DCF /* MovieListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListViewController.swift; sourceTree = "<group>"; };
 		DE27FFFE2D0D7724005C9DCF /* MovieResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieResponseDTO.swift; sourceTree = "<group>"; };
 		DEF556DC2D0D4E9400CF86AA /* Clean-Architecture-MovieApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clean-Architecture-MovieApp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -222,6 +226,7 @@
 		DE27FFF22D0D5A3F005C9DCF /* UseCase */ = {
 			isa = PBXGroup;
 			children = (
+				DE2700152D10471B005C9DCF /* DefaultMovieUseCase.swift */,
 			);
 			path = UseCase;
 			sourceTree = "<group>";
@@ -256,6 +261,7 @@
 		DE27FFF62D0D5A81005C9DCF /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				DE2700172D10481B005C9DCF /* MovieListViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -588,11 +594,13 @@
 				DEF556E22D0D4E9400CF86AA /* SceneDelegate.swift in Sources */,
 				DE2700072D0D8995005C9DCF /* NetworkManager.swift in Sources */,
 				DE27FFFF2D0D7724005C9DCF /* MovieResponseDTO.swift in Sources */,
+				DE2700162D10471C005C9DCF /* DefaultMovieUseCase.swift in Sources */,
 				DE2700012D0D7B95005C9DCF /* MovieService.swift in Sources */,
 				DE27000B2D0D8CFF005C9DCF /* MovieRespository.swift in Sources */,
 				DE27000D2D0DBCA1005C9DCF /* Movie.swift in Sources */,
 				DE2700032D0D8180005C9DCF /* Config.swift in Sources */,
 				DE2700142D0F0788005C9DCF /* MovieListTitleHeaderView.swift in Sources */,
+				DE2700182D10481B005C9DCF /* MovieListViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,7 +701,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -751,7 +759,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

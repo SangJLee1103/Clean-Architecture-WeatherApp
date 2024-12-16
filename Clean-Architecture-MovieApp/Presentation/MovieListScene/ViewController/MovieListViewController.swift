@@ -8,6 +8,9 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
+import RxDataSources
 
 enum Section: Int, CaseIterable {
     case popular
@@ -30,11 +33,25 @@ enum Section: Int, CaseIterable {
 }
 
 final class MovieListViewController: UIViewController {
+    private let viewModel: MovieListViewModel
+    private let disposeBag = DisposeBag()
+    
+    
+    init(viewModel: MovieListViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private lazy var refreshControl = UIRefreshControl().then {
+        $0.tintColor = .white
+    }
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout()).then {
         $0.backgroundColor = .black
-        $0.delegate = self
-        $0.dataSource = self
         $0.register(MovieListCollectionViewCell.self, forCellWithReuseIdentifier: MovieListCollectionViewCell.identifier)
         $0.register(MovieListTitleHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: MovieListTitleHeaderView.identifier)
     }
@@ -58,7 +75,7 @@ final class MovieListViewController: UIViewController {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .groupPaging
+        section.orthogonalScrollingBehavior = .continuous
         section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         section.interGroupSpacing = 8
         
@@ -77,37 +94,73 @@ final class MovieListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        bind()
     }
     
     private func configureUI() {
+        refreshControl.tintColor = .white
+        collectionView.refreshControl = refreshControl
+        
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
-}
-
-// MARK: - UICollectionViewDelegate, UICollectionVIewDataSource
-extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return Section.allCases.count
-    }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCollectionViewCell.identifier, for: indexPath) as? MovieListCollectionViewCell else { return UICollectionViewCell() }
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard kind == UICollectionView.elementKindSectionHeader, let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: MovieListTitleHeaderView.identifier, for: indexPath) as? MovieListTitleHeaderView,
-              let section = Section(rawValue: indexPath.section) else {
-            return UICollectionReusableView()
+    private func bind() {
+        let output = viewModel.trasform(input: .init(
+            viewDidLoadEvent: Observable.just(()),
+            pullToRefresh: refreshControl.rx.controlEvent(.valueChanged).asObservable()
+        ))
+        
+        Observable.combineLatest(
+            output.popularMovies,
+            output.nowPlayingMovies,
+            output.topRatedMovies,
+            output.upcomingMovies
+        )
+        .map { popular, nowPlaying, topRated, upcoming -> [MovieSection] in
+            [
+                MovieSection(section: .popular, items: popular),
+                MovieSection(section: .nowPlaying, items: nowPlaying),
+                MovieSection(section: .topRated, items: topRated),
+                MovieSection(section: .upcoming, items: upcoming)
+            ]
         }
-        headerView.updateUI(title: section.title)
-        return headerView
+        .bind(to: collectionView.rx.items(dataSource: createDataSource()))
+        .disposed(by: disposeBag)
+        
+        output.isLoading
+            .bind(to: refreshControl.rx.isRefreshing)
+            .disposed(by: disposeBag)
+        
+        output.error
+            .subscribe(onNext: { error in
+                print(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func createDataSource() -> RxCollectionViewSectionedReloadDataSource<MovieSection> {
+        RxCollectionViewSectionedReloadDataSource<MovieSection>(
+            configureCell: { dataSource, collectionView, indexPath, movie in
+                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCollectionViewCell.identifier, for: indexPath) as? MovieListCollectionViewCell else { return UICollectionViewCell() }
+                cell.updateUI(posterPath: movie.posterPath)
+                return cell
+            },
+            configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+                guard kind == UICollectionView.elementKindSectionHeader,
+                      let header = collectionView.dequeueReusableSupplementaryView(
+                        ofKind: kind,
+                        withReuseIdentifier: MovieListTitleHeaderView.identifier,
+                        for: indexPath
+                      ) as? MovieListTitleHeaderView else {
+                    return UICollectionReusableView()
+                }
+                let section = dataSource.sectionModels[indexPath.section].section
+                header.updateUI(title: section.title)
+                return header
+            }
+        )
     }
 }
