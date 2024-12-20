@@ -91,19 +91,47 @@ final class MovieListViewController: UIViewController {
         return section
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNavBar()
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureNavBar()
         configureUI()
         bind()
     }
     
+    private func configureNavBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .black
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.tintColor = .white
+        navigationItem.title = "SJ Movie"
+        navigationItem.backButtonTitle = ""
+    }
+    
     private func configureUI() {
+        view.backgroundColor = .black
+        
         refreshControl.tintColor = .white
         collectionView.refreshControl = refreshControl
         
+        let safeArea = view.safeAreaLayoutGuide
+        
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.edges.equalTo(safeArea)
         }
     }
     
@@ -137,6 +165,24 @@ final class MovieListViewController: UIViewController {
         output.error
             .subscribe(onNext: { error in
                 print(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.modelSelected(Movie.self)
+            .withUnretained(self)
+            .subscribe(onNext: { owner, movie in
+                let appearance = UINavigationBarAppearance()
+                appearance.configureWithTransparentBackground()
+                appearance.backgroundColor = .clear
+
+                owner.navigationController?.navigationBar.standardAppearance = appearance
+                owner.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+                owner.navigationController?.navigationBar.compactAppearance = appearance
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    let detailVC = MovieDetailViewController(viewModel: .init(movie: movie))
+                    owner.navigationController?.pushViewController(detailVC, animated: true)
+                }
             })
             .disposed(by: disposeBag)
     }
