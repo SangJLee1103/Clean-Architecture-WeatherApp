@@ -134,7 +134,7 @@ final class MovieListViewModel {
                         error.accept(err)
                     }
                     if case .failure(let err) = upcomingResult {
-                        error.accept(err)
+                         error.accept(err)
                     }
                 },
                 onCompleted: {

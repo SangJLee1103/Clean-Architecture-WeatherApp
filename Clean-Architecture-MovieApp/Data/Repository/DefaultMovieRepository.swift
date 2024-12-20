@@ -25,9 +25,11 @@ extension DefaultMovieRepository: MovieRespository {
                     let movies = response.results.map { dto in
                         Movie(
                             title: dto.title,
-                            overview: dto.overview,
+                            overview: dto.overview, 
+                            backdropPath: dto.backdropPath,
                             posterPath: dto.posterPath ?? "",
-                            voteAverage: dto.voteAverage
+                            voteAverage: dto.voteAverage,
+                            releaseDate: dto.releaseDate
                         )
                     }
                     return .success(movies)

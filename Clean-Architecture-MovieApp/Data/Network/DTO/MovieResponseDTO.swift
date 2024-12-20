@@ -31,14 +31,18 @@ struct MovieDTO: Decodable {
     let originalTitle: String
     let title: String
     let overview: String
+    let backdropPath: String
     let posterPath: String?
     let voteAverage: Double
+    let releaseDate: String
     
     enum CodingKeys: String, CodingKey {
         case originalTitle = "original_title"
         case title
         case overview
+        case backdropPath = "backdrop_path"
         case posterPath = "poster_path"
         case voteAverage = "vote_average"
+        case releaseDate = "release_date"
     }
 }

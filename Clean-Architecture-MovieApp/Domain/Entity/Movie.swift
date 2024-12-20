@@ -10,6 +10,8 @@ import Foundation
 struct Movie {
     let title: String
     let overview: String
+    let backdropPath: String
     let posterPath: String
     let voteAverage: Double
+    let releaseDate: String
 }
