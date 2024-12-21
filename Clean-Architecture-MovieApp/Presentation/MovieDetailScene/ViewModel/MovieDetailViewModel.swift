@@ -22,7 +22,7 @@ final class MovieDetailViewModel {
         let posterPath: Driver<String>
         let title: Driver<String>
         let releaseDate: Driver<String>
-        let average: Driver<Double>
+        let average: Driver<String>
         let overview: Driver<String>
     }
     
@@ -38,8 +38,15 @@ final class MovieDetailViewModel {
         let backgroundPath = movieData.map { $0.backdropPath }.asDriver(onErrorJustReturn: "")
         let posterPath = movieData.map { $0.posterPath }.asDriver(onErrorJustReturn: "")
         let title = movieData.map { $0.title }.asDriver(onErrorJustReturn: "")
-        let releaseDate = movieData.map { $0.releaseDate }.asDriver(onErrorJustReturn: "")
-        let average = movieData.map { $0.voteAverage }.asDriver(onErrorJustReturn: 0.0)
+        
+        let releaseDate = movieData
+            .map { "개봉일: \(Date().formatKoreanDate($0.releaseDate))"}
+            .asDriver(onErrorJustReturn: "")
+        
+        let average = movieData
+            .map { String(format: "%.1f", $0.voteAverage) }
+            .asDriver(onErrorJustReturn: "")
+        
         let overview = movieData.map { $0.overview }.asDriver(onErrorJustReturn: "")
         
         return Output(
@@ -51,5 +58,4 @@ final class MovieDetailViewModel {
             overview: overview
         )
     }
-    
 }

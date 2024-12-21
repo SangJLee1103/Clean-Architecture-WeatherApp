@@ -26,7 +26,7 @@ final class MovieDetailViewController: UIViewController {
     }
     
     private let backgroundImgView = UIImageView().then {
-        $0.contentMode = .scaleToFill
+        $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .gray.withAlphaComponent(0.3)
         $0.clipsToBounds = true
     }
@@ -52,6 +52,7 @@ final class MovieDetailViewController: UIViewController {
     private let releaseDateLabel = UILabel().then {
         $0.textColor = .lightGray
         $0.font = .systemFont(ofSize: 15, weight: .medium)
+        $0.textAlignment = .right
     }
     
     private let averageStackView = UIStackView().then {
@@ -117,7 +118,7 @@ final class MovieDetailViewController: UIViewController {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(posterImgView.snp.bottom).offset(20)
             $0.leading.equalTo(safeArea).offset(20)
-            $0.trailing.equalTo(releaseDateLabel.snp.leading).offset(-10)
+            $0.trailing.equalTo(releaseDateLabel.snp.leading).offset(-20).priority(.high)
         }
         
         averageStackView.snp.makeConstraints {
@@ -128,6 +129,7 @@ final class MovieDetailViewController: UIViewController {
         releaseDateLabel.snp.makeConstraints {
             $0.centerY.equalTo(titleLabel)
             $0.trailing.equalTo(safeArea).inset(20)
+            $0.width.greaterThanOrEqualTo(140)
         }
         
         overviewLabel.snp.makeConstraints {
@@ -143,19 +145,11 @@ final class MovieDetailViewController: UIViewController {
         ))
         
         output.backdropPath
-            .drive(onNext: { [weak self] path in
-                if let url = ImageUtil.getPosterURL(path: path) {
-                    self?.backgroundImgView.sd_setImage(with: url)
-                }
-            })
+            .drive(backgroundImgView.rx.imagePath)
             .disposed(by: disposeBag)
         
         output.posterPath
-            .drive(onNext: { [weak self] path in
-                if let url = ImageUtil.getPosterURL(path: path) {
-                    self?.posterImgView.sd_setImage(with: url)
-                }
-            })
+            .drive(posterImgView.rx.imagePath)
             .disposed(by: disposeBag)
         
         output.title
@@ -163,12 +157,10 @@ final class MovieDetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.releaseDate
-            .map { "개봉일: \(Date().formatKoreanDate($0))"}
             .drive(releaseDateLabel.rx.text)
             .disposed(by: disposeBag)
         
         output.average
-            .map { String(format: "%.1f", $0) }
             .drive(averageLabel.rx.text)
             .disposed(by: disposeBag)
         
