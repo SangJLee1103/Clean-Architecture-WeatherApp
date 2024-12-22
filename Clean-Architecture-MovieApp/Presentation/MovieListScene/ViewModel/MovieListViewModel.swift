@@ -93,54 +93,29 @@ final class MovieListViewModel {
     ) -> Observable<Void> {
         isLoading.accept(true)
         
-        let popular = fetchMovies(type: .popular)
-            .do(onNext: { result in
-                if case .success(let movies) = result {
-                    popularMovies.accept(movies)
-                }
-            })
+        let movieTypes: [(MovieType, BehaviorRelay<[Movie]>)] = [
+            (.popular, popularMovies),
+            (.nowPlaying, nowPlayingMovies),
+            (.topRated, topRatedMovies),
+            (.upcoming, upcomingMovies)
+        ]
         
-        let nowPlaying = fetchMovies(type: .nowPlaying)
-            .do(onNext: { result in
-                if case .success(let movies) = result {
-                    nowPlayingMovies.accept(movies)
-                }
-            })
-        
-        let topRated = fetchMovies(type: .topRated)
-            .do(onNext: { result in
-                if case .success(let movies) = result {
-                    topRatedMovies.accept(movies)
-                }
-            })
-        
-        let upcoming = fetchMovies(type: .upcoming)
-            .do(onNext: { result in
-                if case .success(let movies) = result {
-                    upcomingMovies.accept(movies)
-                }
-            })
-        
-        return Observable.zip(popular, nowPlaying, topRated, upcoming)
-            .do(
-                onNext: { (popularResult, nowPlayingResult, topRatedResult, upcomingResult) in
-                    if case .failure(let err) = popularResult {
+        let observables = movieTypes.map { (type, relay) in
+            fetchMovies(type: type)
+                .do(onNext: { result in
+                    if case .success(let movies) = result {
+                        relay.accept(movies)
+                    }
+                    if case .failure(let err) = result {
                         error.accept(err)
                     }
-                    if case .failure(let err) = nowPlayingResult {
-                        error.accept(err)
-                    }
-                    if case .failure(let err) = topRatedResult {
-                        error.accept(err)
-                    }
-                    if case .failure(let err) = upcomingResult {
-                         error.accept(err)
-                    }
-                },
-                onCompleted: {
-                    isLoading.accept(false)
-                }
-            )
+                })
+        }
+        
+        return Observable.zip(observables)
+            .do(onCompleted: {
+                isLoading.accept(false)
+            })
             .map { _ in () }
     }
     
