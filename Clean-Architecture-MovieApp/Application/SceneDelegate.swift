@@ -10,6 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
+    private var appCoordinator: AppCoordinator?
     
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -19,17 +20,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window?.backgroundColor = .black
         window = UIWindow(windowScene: scene)
-        let viewController = MovieListViewController(viewModel: MovieListViewModel(
-            movieListUseCase: DefaultMovieUseCase(
-                repository: DefaultMovieRepository(
-                    movieService: MovieService()
-                )
-            )
-        ))
+       
+        let navigationController = UINavigationController()
+        appCoordinator = AppCoordinator(navigationController: navigationController)
         
-        let navigationController = UINavigationController(rootViewController: viewController)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+        
+        appCoordinator?.start()
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

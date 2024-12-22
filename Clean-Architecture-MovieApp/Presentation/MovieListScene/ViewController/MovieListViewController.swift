@@ -33,6 +33,7 @@ enum Section: Int, CaseIterable {
 }
 
 final class MovieListViewController: UIViewController {
+    weak var coordinator: MovieListCoordinator?
     private let viewModel: MovieListViewModel
     private let disposeBag = DisposeBag()
     
@@ -174,14 +175,13 @@ final class MovieListViewController: UIViewController {
                 let appearance = UINavigationBarAppearance()
                 appearance.configureWithTransparentBackground()
                 appearance.backgroundColor = .clear
-
+                
                 owner.navigationController?.navigationBar.standardAppearance = appearance
                 owner.navigationController?.navigationBar.scrollEdgeAppearance = appearance
                 owner.navigationController?.navigationBar.compactAppearance = appearance
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    let detailVC = MovieDetailViewController(viewModel: .init(movie: movie))
-                    owner.navigationController?.pushViewController(detailVC, animated: true)
+                    owner.coordinator?.showMovieDetail(with: movie)
                 }
             })
             .disposed(by: disposeBag)

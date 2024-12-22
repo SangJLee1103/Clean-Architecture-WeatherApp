@@ -17,5 +17,4 @@ extension Date {
         dateFormatter.dateFormat = "yyyy년 M월 d일"
         return dateFormatter.string(from: date)
     }
-    
 }
