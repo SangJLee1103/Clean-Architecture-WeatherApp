@@ -35,12 +35,12 @@ final class MovieListViewModel {
     }
     
     struct Output {
-        let popularMovies: BehaviorRelay<[Movie]>
-        let nowPlayingMovies: BehaviorRelay<[Movie]>
-        let topRatedMovies: BehaviorRelay<[Movie]>
-        let upcomingMovies: BehaviorRelay<[Movie]>
-        let isLoading: BehaviorRelay<Bool>
-        let error: PublishRelay<Error>
+        let popularMovies = BehaviorRelay<[Movie]>(value: [])
+        let nowPlayingMovies = BehaviorRelay<[Movie]>(value: [])
+        let topRatedMovies = BehaviorRelay<[Movie]>(value: [])
+        let upcomingMovies = BehaviorRelay<[Movie]>(value: [])
+        let isLoading = BehaviorRelay<Bool>(value: false)
+        let error = PublishRelay<Error>()
     }
     
     init(movieListUseCase: MovieListUseCase) {
@@ -48,12 +48,7 @@ final class MovieListViewModel {
     }
     
     func trasform(input: Input) -> Output {
-        let popularMovies = BehaviorRelay<[Movie]>(value: [])
-        let nowPlayingMovies = BehaviorRelay<[Movie]>(value: [])
-        let topRatedMovies = BehaviorRelay<[Movie]>(value: [])
-        let upcomingMovies = BehaviorRelay<[Movie]>(value: [])
-        let isLoading = BehaviorRelay<Bool>(value: false)
-        let error = PublishRelay<Error>()
+        let output = Output()
         
         Observable.merge(
             input.viewDidLoadEvent,
@@ -62,25 +57,18 @@ final class MovieListViewModel {
         .flatMap { [weak self] _ -> Observable<Void> in
             guard let self = self else { return .empty() }
             return self.loadAllSections(
-                popularMovies: popularMovies,
-                nowPlayingMovies: nowPlayingMovies,
-                topRatedMovies: topRatedMovies,
-                upcomingMovies: upcomingMovies,
-                isLoading: isLoading,
-                error: error
+                popularMovies: output.popularMovies,
+                nowPlayingMovies: output.nowPlayingMovies,
+                topRatedMovies: output.topRatedMovies,
+                upcomingMovies: output.upcomingMovies,
+                isLoading: output.isLoading,
+                error: output.error
             )
         }
         .subscribe()
         .disposed(by: disposeBag)
         
-        return Output(
-            popularMovies: popularMovies,
-            nowPlayingMovies: nowPlayingMovies,
-            topRatedMovies: topRatedMovies,
-            upcomingMovies: upcomingMovies,
-            isLoading: isLoading,
-            error: error
-        )
+        return output
     }
     
     private func loadAllSections(

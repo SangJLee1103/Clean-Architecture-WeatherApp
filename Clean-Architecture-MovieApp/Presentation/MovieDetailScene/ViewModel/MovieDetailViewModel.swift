@@ -35,9 +35,17 @@ final class MovieDetailViewModel {
             .map { [weak self] _ in self?.movie }
             .compactMap { $0 }
         
-        let backgroundPath = movieData.map { $0.backdropPath }.asDriver(onErrorJustReturn: "")
-        let posterPath = movieData.map { $0.posterPath }.asDriver(onErrorJustReturn: "")
-        let title = movieData.map { $0.title }.asDriver(onErrorJustReturn: "")
+        let backgroundPath = movieData
+            .map { $0.backdropPath }
+            .asDriver(onErrorJustReturn: "")
+        
+        let posterPath = movieData
+            .map { $0.posterPath }
+            .asDriver(onErrorJustReturn: "")
+        
+        let title = movieData
+            .map { $0.title }
+            .asDriver(onErrorJustReturn: "")
         
         let releaseDate = movieData
             .map { "개봉일: \(Date().formatKoreanDate($0.releaseDate))"}
@@ -47,7 +55,9 @@ final class MovieDetailViewModel {
             .map { String(format: "%.1f", $0.voteAverage) }
             .asDriver(onErrorJustReturn: "")
         
-        let overview = movieData.map { $0.overview }.asDriver(onErrorJustReturn: "")
+        let overview = movieData
+            .map { $0.overview }
+            .asDriver(onErrorJustReturn: "")
         
         return Output(
             backdropPath: backgroundPath,
