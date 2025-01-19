@@ -93,8 +93,7 @@ final class MovieListViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        configureNavBar()
+        super.viewDidAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
     }
     
@@ -124,9 +123,6 @@ final class MovieListViewController: UIViewController {
     
     private func configureUI() {
         view.backgroundColor = .black
-        
-        refreshControl.tintColor = .white
-        collectionView.refreshControl = refreshControl
         
         let safeArea = view.safeAreaLayoutGuide
         

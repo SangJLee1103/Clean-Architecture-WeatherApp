@@ -8,20 +8,18 @@
 import UIKit
 
 final class AppCoordinator: Coordinator {
-    var navigationController: UINavigationController
-    var childCoordinator: [Coordinator] = []
+    var childCoordinators: [Coordinator] = []
+    let window: UIWindow?
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init(_ window: UIWindow?) {
+        self.window = window
+        window?.makeKeyAndVisible()
     }
     
     func start() {
-        showMovieList()
-    }
-    
-    private func showMovieList() {
-        let movieListCoordinator = MovieListCoordinator(navigationController: navigationController)
-        childCoordinator.append(movieListCoordinator)
-        movieListCoordinator.start()
+        let tabBarCoordinator = TabBarCoordinator()
+        childCoordinators.append(tabBarCoordinator)
+        tabBarCoordinator.start()
+        window?.rootViewController = tabBarCoordinator.tabBarController
     }
 }

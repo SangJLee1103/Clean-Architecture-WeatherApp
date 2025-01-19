@@ -8,8 +8,9 @@
 import UIKit
 
 final class MovieListCoordinator: Coordinator {
+    weak var parentCoordinator: Coordinator?
+    var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
-    var childCoordinator: [Coordinator] = []
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -25,12 +26,16 @@ final class MovieListCoordinator: Coordinator {
         )
         let viewController = MovieListViewController(viewModel: viewModel)
         viewController.coordinator = self
-        navigationController.pushViewController(viewController, animated: true)
+        navigationController.setViewControllers([viewController], animated: false)
     }
     
     func showMovieDetail(with movie: Movie) {
-        let viewModel = MovieDetailViewModel(movie: movie)
-        let viewController = MovieDetailViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: true)
+        let movieDetailCoordinator = MovieDetailCoordinator(
+            navigationController: navigationController,
+            movie: movie
+        )
+        childCoordinators.append(movieDetailCoordinator)
+        movieDetailCoordinator.parentCoordinator = self
+        movieDetailCoordinator.start()
     }
 }

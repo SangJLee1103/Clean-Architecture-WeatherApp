@@ -8,7 +8,15 @@
 import UIKit
 
 protocol Coordinator: AnyObject {
-    var navigationController: UINavigationController { get set }
-    var childCoordinator: [Coordinator] { get set }
+    var childCoordinators: [Coordinator] { get set }
     func start()
 }
+
+protocol TabBarCoordinating: Coordinator {
+    var tabBarController: UITabBarController { get }
+}
+
+protocol NavigationCoordinating: Coordinator {
+    var navigationController: UINavigationController { get }
+}
+
