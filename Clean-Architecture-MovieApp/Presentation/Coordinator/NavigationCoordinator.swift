@@ -7,6 +7,6 @@
 
 import UIKit
 
-protocol NavigatioCoordinator: Coordinator {
+protocol NavigationCoordinator: Coordinator {
     var navigationController: UINavigationController { get }
 }

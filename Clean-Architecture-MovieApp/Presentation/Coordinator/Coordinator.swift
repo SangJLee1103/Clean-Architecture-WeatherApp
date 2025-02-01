@@ -19,4 +19,3 @@ protocol TabBarCoordinating: Coordinator {
 protocol NavigationCoordinating: Coordinator {
     var navigationController: UINavigationController { get }
 }
-
