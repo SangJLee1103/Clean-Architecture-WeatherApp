@@ -69,6 +69,10 @@ final class SearchMovieTableViewCell: UITableViewCell {
             contentView.addSubview($0)
         }
         
+        averageLabel.snp.makeConstraints {
+            $0.width.equalTo(30)
+        }
+        
         posterImgView.snp.makeConstraints {
             $0.width.equalTo(55)
             $0.height.equalTo(68)
@@ -83,7 +87,7 @@ final class SearchMovieTableViewCell: UITableViewCell {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(posterImgView)
             $0.leading.equalTo(posterImgView.snp.trailing).offset(10)
-            $0.trailing.equalTo(averageStackView.snp.leading).offset(15)
+            $0.trailing.equalTo(averageStackView.snp.leading).offset(-15)
         }
         
         actorsLabel.snp.makeConstraints {
@@ -107,6 +111,6 @@ final class SearchMovieTableViewCell: UITableViewCell {
         if let url = ImageUtil.getPosterURL(path: movie.posterPath) {
             posterImgView.sd_setImage(with: url)
         }
-        actorsLabel.text = "출연: 송강호, 이정재, 이병헌"
+        actorsLabel.text = "출연: "
     }
 }

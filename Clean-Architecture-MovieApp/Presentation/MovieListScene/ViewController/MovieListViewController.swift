@@ -109,12 +109,9 @@ final class MovieListViewController: UIViewController {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .black
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.shadowColor = .clear
         
         navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.tintColor = .white
         navigationItem.title = "SJ Movie"

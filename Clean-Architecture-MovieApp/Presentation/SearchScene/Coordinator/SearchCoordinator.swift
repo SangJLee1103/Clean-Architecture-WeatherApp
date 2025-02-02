@@ -17,7 +17,15 @@ final class SearchCoordinator: Coordinator {
     }
     
     func start() {
-        let viewController = SearchViewController()
+        let viewController = SearchViewController(
+            viewModel: SearchViewModel(
+                searchUseCase: DefaultSearchUseCase(
+                    repository: DefaultMovieRepository(
+                        movieService: MovieService()
+                    )
+                )
+            )
+        )
         viewController.coordinator = self
         navigationController.setViewControllers([viewController], animated: true)
     }

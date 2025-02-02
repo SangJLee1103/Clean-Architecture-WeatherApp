@@ -14,6 +14,8 @@ import RxCocoa
 
 final class SearchViewController: UIViewController {
     weak var coordinator: SearchCoordinator?
+    private let viewModel: SearchViewModel
+    private let disposeBag = DisposeBag()
     
     let movie = Movie(
         title: "핌피네로: 블러드 앤드 오일",
@@ -27,20 +29,25 @@ final class SearchViewController: UIViewController {
     private let searchController = UISearchController(searchResultsController: nil)
     
     private lazy var tableView = UITableView().then {
+        $0.separatorStyle = .none
         $0.rowHeight = UITableView.automaticDimension
-        $0.delegate = self
-        $0.dataSource = self
         $0.register(SearchMovieTableViewCell.self, forCellReuseIdentifier: SearchMovieTableViewCell.identifer)
     }
     
-    private var isSearchMode: Bool {
-        return searchController.isActive && !searchController.searchBar.text!.isEmpty
+    init(viewModel: SearchViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureSearchController()
+        bind()
     }
     
     private func configureUI() {
@@ -64,22 +71,68 @@ final class SearchViewController: UIViewController {
     }
     
     private func bind() {
-        searchController.searchBar.rx.text
-            .orEmpty
-            .distinctUntilChanged()
-            .map {  }
+        let input = SearchViewModel.Input(
+            movieText: searchController.searchBar.rx.text.orEmpty.asObservable(),
+            loadNextPage: tableView.rx.reachedBottom.asObservable(),
+            searchControllerIsActive: searchController.rx.isActive
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.movies
+            .bind(to: tableView.rx.items(
+                cellIdentifier: SearchMovieTableViewCell.identifer,
+                cellType: SearchMovieTableViewCell.self
+            )) { _, movie, cell in
+                cell.updateUI(movie: movie)
+            }
+            .disposed(by: disposeBag)
+        
+        output.error
+            .subscribe(onNext: { error in
+                print("Error: \(error.localizedDescription)")
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.rx.modelSelected(Movie.self)
+            .subscribe(onNext: { [weak self] movie in
+                // TODO: MovieDetail로 PushVC
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.rx.didScroll
+            .filter { [weak self] in
+                self?.tableView.isDragging == true
+            }
+            .subscribe(onNext: { [weak self] _ in
+                self?.searchController.searchBar.resignFirstResponder()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
-extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+extension Reactive where Base: UITableView {
+    var reachedBottom: ControlEvent<Void> {
+        let source = self.contentOffset.map { [weak base] contentOffset in
+            guard let base = base else { return false }
+            
+            let visibleHeight = base.frame.height - base.contentInset.top - base.contentInset.bottom
+            let y = contentOffset.y + base.contentInset.top
+            let threshold = max(0.0, base.contentSize.height - visibleHeight)
+            
+            return y > threshold - 100
+        }
+            .distinctUntilChanged()
+            .filter { $0 }
+            .map { _ in () }
+        
+        return ControlEvent(events: source)
     }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SearchMovieTableViewCell.identifer, for: indexPath) as! SearchMovieTableViewCell
-        cell.updateUI(movie: movie)
-        return cell
+}
+
+extension Reactive where Base: UISearchController {
+    var isActive: Observable<Bool> {
+        return self.observe(Bool.self, #keyPath(UISearchController.isActive))
+            .compactMap { $0 }
     }
 }
