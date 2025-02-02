@@ -25,7 +25,29 @@ extension DefaultMovieRepository: MovieRespository {
                     let movies = response.results.map { dto in
                         Movie(
                             title: dto.title,
-                            overview: dto.overview, 
+                            overview: dto.overview,
+                            backdropPath: dto.backdropPath,
+                            posterPath: dto.posterPath ?? "",
+                            voteAverage: dto.voteAverage,
+                            releaseDate: dto.releaseDate
+                        )
+                    }
+                    return .success(movies)
+                case .failure(let error):
+                    return .failure(error)
+                }
+            }
+    }
+    
+    func searchMovie(title: String, language: String, page: Int) -> Observable<Result<[Movie], any Error>> {
+        movieService.searchMovie(title: title, language: language, page: page)
+            .map { result in
+                switch result {
+                case .success(let response):
+                    let movies = response.results.map { dto in
+                        Movie(
+                            title: dto.title,
+                            overview: dto.overview,
                             backdropPath: dto.backdropPath,
                             posterPath: dto.posterPath ?? "",
                             voteAverage: dto.voteAverage,

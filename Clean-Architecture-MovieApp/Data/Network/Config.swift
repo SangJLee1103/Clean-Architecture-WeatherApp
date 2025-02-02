@@ -21,5 +21,10 @@ enum Config {
 }
 
 extension Config {
-    static let baseURL: String = "https://api.themoviedb.org/3/movie"
+    static let baseAPIURL = "https://api.themoviedb.org/3"
+    
+    enum Endpoint {
+        static let movie = "\(baseAPIURL)/movie"
+        static let search = "\(baseAPIURL)/search/movie"
+    }
 }

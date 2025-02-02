@@ -10,4 +10,5 @@ import RxSwift
 
 protocol MovieRespository {
     func fetchMovieList(type: MovieType, language: String, page: Int) -> Observable<Result<[Movie], Error>>
+    func searchMovie(title: String, language: String, page: Int) -> Observable<Result<[Movie], Error>>
 }
